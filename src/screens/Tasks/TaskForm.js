@@ -1,8 +1,12 @@
 import React, {useState} from 'react'
 import { Button, StyleSheet, TextInput, View } from 'react-native'
+import { useDispatch } from 'react-redux'
 
-const TaskForm = ({onAddTask}) => {
+import { addTask } from '../../redux/actions'
+
+const TaskForm = () => {
     const [newTitle, setNewTitle] = useState("")
+    const dispatch = useDispatch()
 
     const onChangeText = (val) => {
         setNewTitle(val)
@@ -11,7 +15,7 @@ const TaskForm = ({onAddTask}) => {
     const onAddNewTask = () => {
         if (newTitle === '') return
 
-        onAddTask(newTitle)
+        dispatch(addTask(newTitle))
         setNewTitle('')
     }
 
@@ -26,7 +30,7 @@ const TaskForm = ({onAddTask}) => {
             <Button 
                 onPress={onAddNewTask}
                 title="Ajouter"
-                color="red"
+                color="#E04F5F"
                 style={styles.button}
 
             />
@@ -43,15 +47,15 @@ const styles = StyleSheet.create({
         marginTop:10
     },
     input:{
-        borderColor:'red',
+        borderColor:'#E04F5F',
         borderBottomWidth:1,
         height:30,
         fontSize:18,
         paddingHorizontal:10
     },
     button: {
-        backgroundColor:'red',
-        borderRadius:5
+        backgroundColor:'#E04F5F',
+        borderRadius:15
     }
 })
 

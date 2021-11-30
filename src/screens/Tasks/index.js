@@ -1,15 +1,19 @@
 import React, { useState } from 'react'
 import { FlatList, StyleSheet, View} from 'react-native'
+import { useSelector, useDispatch } from 'react-redux'
 
 import TaskTile from './TaskTile'
 import Header from "../../components/Header"
 import TaskForm from './TaskForm'
 import FloatingButton from '../../components/FloatingButton'
 import Counter from '../../components/Counter'
+import { deleteTask, toggleTask } from '../../redux/actions'
+import { getTasks } from '../../redux/selectors'
 
 export default function TasksScreen() {
-    const [tasks, setTasks] = useState([])
     const [toggleForm, setToggleForm] = useState(false)
+    const dispatch = useDispatch()
+    const tasks = useSelector(getTasks)
 
     const _onToggleForm = () => {
         setToggleForm(!toggleForm)
@@ -19,44 +23,12 @@ export default function TasksScreen() {
         return <TaskTile task={item} onUpdateTask={onUpdateTask} onDeleteTask={onDeleteTask}/>
     }
 
-    const onAddTask = (title) => {
-        setTasks([...tasks, {
-            id: Date.now(),
-            title,
-            isCompleted : false
-        }])
-    }
-
     const onDeleteTask = (id) => {
-        let newTasks = []
-    
-        tasks.forEach(t => {
-            if(t.id !== id){
-                newTasks.push(t)
-                return
-            }
-        })
-    
-        setTasks(newTasks)
+        dispatch(deleteTask(id))
     }
 
     const onUpdateTask = (id) => {
-        let newTasks = []
-
-        tasks.forEach(t => {
-            if(t.id !== id){
-                newTasks.push(t)
-                return
-            }
-
-            newTasks.push({
-                id,
-                title: t.title,
-                isCompleted: !t.isCompleted
-            })
-        })
-
-        setTasks(newTasks)
+        dispatch(toggleTask(id))
     }
 
     let titleCounterTask = tasks.length > 1 ? "Tâches ajoutées" : "Tâche ajoutée"
@@ -72,15 +44,18 @@ export default function TasksScreen() {
                         <Counter nb={tasks.length} title={titleCounterTask} align={true}/>
                         <Counter nb={tasks.filter(t => t.isCompleted === true).length} title={titleCounterTaskCompleted} align={false}/>
                     </View>
-                    { toggleForm && <TaskForm onAddTask={onAddTask}/>}
+                    { toggleForm && <TaskForm/>}
                 </>
                 }
                 contentContainerStyle={{flexGrow:1}}
                 data={tasks}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderItem}
+                style={styles.container}
             />
-            <FloatingButton toggle={_onToggleForm} isOpen={toggleForm} />
+            <View style={styles.btnContainer}>
+                <FloatingButton toggle={_onToggleForm} isOpen={toggleForm} />
+            </View>
         </>
     )
 }
@@ -90,5 +65,9 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         justifyContent:'space-between',
         paddingHorizontal:20,
+    },
+    btnContainer:{
+        alignItems: 'flex-end',
+        padding:30
     }
 })
